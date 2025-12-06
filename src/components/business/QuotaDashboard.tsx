@@ -1,19 +1,11 @@
 import React from 'react';
-import { GlassProgressBar } from '../base-ui/GlassProgressBar';
-import { cn } from '@/utils/utils';
+import {GlassProgressBar} from '../base-ui/GlassProgressBar';
+import {cn} from '@/utils/utils';
 import './QuotaDashboard.css';
-
-interface QuotaInfo {
-    remainingFraction: number;
-}
-
-interface ModelConfig {
-    label: string;
-    quotaInfo: QuotaInfo;
-}
+import {CloudCodeAPITypes} from "@/services/cloudcode-api.types.ts";
 
 interface QuotaDashboardProps {
-    models: ModelConfig[];
+  model: CloudCodeAPITypes.FetchAvailableModelsResponse;
     className?: string;
 }
 
@@ -46,7 +38,17 @@ const getProgressConfig = (usage: number) => {
     }
 };
 
-export const QuotaDashboard: React.FC<QuotaDashboardProps> = ({ models, className }) => {
+export const QuotaDashboard: React.FC<QuotaDashboardProps> = ({model, className}) => {
+
+    const models = [
+      model.models["gemini-3-pro-high"],
+      model.models["gemini-3-pro-low"],
+      model.models["claude-sonnet-4-5"],
+      model.models["claude-sonnet-4-5-thinking"],
+      model.models["claude-opus-4-5-thinking"],
+      model.models["gpt-oss-120b-medium"],
+    ];
+
     return (
         <div className={cn("bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 mb-6 quota-dashboard-entry", className)}>
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
@@ -59,10 +61,10 @@ export const QuotaDashboard: React.FC<QuotaDashboardProps> = ({ models, classNam
                     const config = getProgressConfig(usageValue);
 
                     return (
-                        <div key={`${model.label}-${idx}`} className="flex flex-col gap-2 p-3 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800">
+                        <div key={`${model.displayName}-${idx}`} className="flex flex-col gap-2 p-3 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800">
                             <div className="flex justify-between items-end px-1">
-                                <span className="text-xs font-semibold text-gray-700 dark:text-gray-200 truncate max-w-[180px]" title={model.label}>
-                                    {model.label}
+                                <span className="text-xs font-semibold text-gray-700 dark:text-gray-200 truncate max-w-[180px]" title={model.displayName}>
+                                    {model.displayName}
                                 </span>
                                 <span className={cn("text-xs font-bold font-mono", config.textColor)}>
                                     {(usageValue * 100).toFixed(0)}%

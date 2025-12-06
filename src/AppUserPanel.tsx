@@ -2,8 +2,7 @@ import React, {useCallback, useEffect, useState} from "react";
 import type {AntigravityAccount} from "@/commands/types/account.types.ts";
 import BusinessUserDetail from "@/components/business/UserDetail.tsx";
 import {useAntigravityAccount, useCurrentAntigravityAccount} from "@/modules/use-antigravity-account.ts";
-import {useLanguageServerUserInfo} from "@/modules/use-language-server-user-info";
-import {useLanguageServerState} from "@/hooks/use-language-server-state.ts";
+import {useAvailableModels} from "@/modules/use-available-models.ts";
 import {BaseTooltip} from "@/components/base-ui/BaseTooltip.tsx";
 import BusinessActionButton from "@/components/business/ActionButton.tsx";
 import {Trash2} from "lucide-react";
@@ -19,8 +18,7 @@ export function AppUserPanel() {
   const [isUserDetailOpen, setIsUserDetailOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AntigravityAccount | null>(null);
   const antigravityAccount = useAntigravityAccount();
-  const languageServerUserInfo = useLanguageServerUserInfo();
-  const languageServerState = useLanguageServerState();
+  const availableModels = useAvailableModels();
   const currentAntigravityAccount = useCurrentAntigravityAccount();
   const appGlobalLoader = useAppGlobalLoader();
 
@@ -51,18 +49,11 @@ export function AppUserPanel() {
   }, []);
 
   useEffect(() => {
-    if (languageServerState.initialized) {
-      antigravityAccount.users.forEach(user => {
-        languageServerUserInfo.fetchData(user)
-      })
-    }
     antigravityAccount.updateCurrentAccount()
-  }, [antigravityAccount.users, languageServerState.initialized]);
-
-  // 获取当前用户的配额数据
-  const currentQuotaData = currentAntigravityAccount && languageServerUserInfo.users[currentAntigravityAccount?.id]?.userStatus
-    ? languageServerUserInfo.users[currentAntigravityAccount.id].userStatus.cascadeModelConfigData.clientModelConfigs
-    : [];
+    antigravityAccount.users.forEach(user => {
+      availableModels.fetchData(user)
+    })
+  }, [antigravityAccount.users]);
 
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -132,11 +123,6 @@ export function AppUserPanel() {
           )}
         </div>
 
-        {/* 配额仪表盘 */}
-        {currentQuotaData.length > 0 && (
-          <QuotaDashboard models={currentQuotaData} />
-        )}
-
         <div className={antigravityAccount.users.length === 0 ? "backup-list-empty" : "backup-list-vertical"}>
           {antigravityAccount.users.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
@@ -156,6 +142,7 @@ export function AppUserPanel() {
             <div className="space-y-2">
               {antigravityAccount.users.map((user, index) => (
                 <UserListItem
+                  availableModels={availableModels.data[user.api_key]}
                   key={`${user.email}-${index}`}
                   user={user}
                   isCurrent={currentAntigravityAccount?.email === user.email}

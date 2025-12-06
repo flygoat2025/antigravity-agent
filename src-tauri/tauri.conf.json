@@ -88,7 +88,15 @@
             "process:default",
             "process:allow-restart",
             "core:webview:allow-internal-toggle-devtools",
-            "os:default"
+            "os:default",
+            "http:default",
+            "http:allow-fetch",
+            {
+              "identifier": "http:default",
+              "allow": [
+                { "url": "https://daily-cloudcode-pa.sandbox.googleapis.com" }
+              ]
+            }
           ]
         }
       ]

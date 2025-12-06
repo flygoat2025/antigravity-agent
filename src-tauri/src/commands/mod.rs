@@ -29,7 +29,6 @@ pub mod db_monitor_commands;
 // 语言服务器相关命令（在 src/language_server 下）
 
 // 重新导出所有命令，保持与 main.rs 的兼容性
-pub use crate::language_server::*;
 pub use account_commands::*;
 pub use backup_commands::*;
 pub use db_monitor_commands::*;

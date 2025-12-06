@@ -6,7 +6,6 @@ import {useAntigravityIsRunning} from './hooks/useAntigravityIsRunning';
 import {Toaster} from 'react-hot-toast';
 import AppToolbar from './AppToolbar.tsx';
 import {TooltipProvider} from './components/ui/tooltip';
-import {useLanguageServerState} from "@/hooks/use-language-server-state.ts";
 import {AppUserPanel} from "@/AppUserPanel.tsx";
 import {AppGlobalLoader} from "@/AppGlobalLoader.tsx";
 import {AntigravityStatusScreen} from "@/components/business/AntigravityStatusScreen";
@@ -15,8 +14,7 @@ import {PlatformCommands} from "@/commands/PlatformCommands.ts";
 function App() {
   // ========== 应用状态 ==========
   const [isDetecting, setIsDetecting] = useState(true);
-  const languageServerState = useLanguageServerState();
-
+  
   // ========== Hook 集成 ==========
   useDevToolsShortcut();
 
@@ -42,15 +40,7 @@ function App() {
     return () => antigravityIsRunning.stopAutoCheck();
   }, []);
 
-  // 处理语言服务的状态
-  useEffect(() => {
-    if (antigravityIsRunning.isRunning) {
-      languageServerState.initialize();
-    } else {
-      languageServerState.clear();
-    }
-  }, [antigravityIsRunning.isRunning]);
-
+  
   // ========== 初始化启动流程 ==========
   const initializeApp = async () => {
     try {

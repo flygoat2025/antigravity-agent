@@ -6,6 +6,8 @@ import {BaseButton} from "@/components/base-ui/BaseButton.tsx";
 import {Check, Trash2} from "lucide-react";
 import {maskEmail, maskName} from "@/utils/username-masking.ts";
 import {cn} from "@/utils/utils.ts";
+import {CloudCodeAPITypes} from "@/services/cloudcode-api.types.ts";
+import {GlassProgressBar} from "@/components/base-ui/GlassProgressBar.tsx";
 
 interface UserListItemProps {
   user: AntigravityAccount;
@@ -13,7 +15,37 @@ interface UserListItemProps {
   onSelect: (user: AntigravityAccount) => void;
   onSwitch: (email: string) => void;
   onDelete: (email: string) => void;
+  availableModels: CloudCodeAPITypes.FetchAvailableModelsResponse;
 }
+
+const getProgressConfig = (usage: number) => {
+  if (usage >= 0.9) {
+    return {
+      from: 'from-red-500',
+      to: 'to-rose-600',
+      textColor: 'text-red-600 dark:text-red-400'
+    };
+  } else if (usage >= 0.7) {
+    return {
+      from: 'from-amber-400',
+      to: 'to-orange-500',
+      textColor: 'text-orange-600 dark:text-orange-400'
+    };
+  } else if (usage >= 0.4) {
+    return {
+      from: 'from-blue-400',
+      to: 'to-indigo-500',
+      textColor: 'text-blue-600 dark:text-blue-400'
+    };
+  } else {
+    return {
+      from: 'from-emerald-400',
+      to: 'to-teal-500',
+      textColor: 'text-emerald-600 dark:text-emerald-400'
+    };
+  }
+};
+
 
 export const UserListItem: React.FC<UserListItemProps> = ({
                                                             user,
@@ -21,6 +53,7 @@ export const UserListItem: React.FC<UserListItemProps> = ({
                                                             onSelect,
                                                             onSwitch,
                                                             onDelete,
+                                                            availableModels,
                                                           }) => {
   const getAvatarUrl = (base64Url: string) => {
     try {
@@ -34,6 +67,13 @@ export const UserListItem: React.FC<UserListItemProps> = ({
   };
 
   const avatarUrl = getAvatarUrl(user.profile_url);
+
+  const models = availableModels
+    ? [
+      availableModels.models["gemini-3-pro-high"],
+      availableModels.models["claude-sonnet-4-5"]
+    ]
+    : []
 
   return (
     <div
@@ -132,6 +172,36 @@ export const UserListItem: React.FC<UserListItemProps> = ({
             </BaseTooltip>
           </>
         )}
+        {
+          models.map((model, idx) => {
+            const usageValue = 1 - model.quotaInfo.remainingFraction;
+            const config = getProgressConfig(usageValue);
+
+            return (
+              <div key={`${model.displayName}-${idx}`}
+                   className="flex flex-col gap-2 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800">
+                <div className="flex justify-between items-end px-1 w-[160px]">
+                                <span
+                                  className="text-xs font-semibold text-gray-700 dark:text-gray-200 truncate max-w-[180px]"
+                                  title={model.displayName}>
+                                    {model.displayName}
+                                </span>
+                  <span className={cn("text-xs font-bold font-mono", config.textColor)}>
+                                    {(usageValue * 100).toFixed(0)}%
+                                </span>
+                </div>
+                <GlassProgressBar
+                  value={usageValue}
+                  height="h-4"
+                  className="w-full bg-gray-200 dark:bg-gray-700 border-0"
+                  gradientFrom={config.from}
+                  gradientTo={config.to}
+                />
+              </div>
+            );
+          })
+        }
+
       </div>
     </div>
   );

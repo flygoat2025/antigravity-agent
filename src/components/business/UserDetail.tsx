@@ -5,6 +5,8 @@ import {BaseDialog, BaseDialogContent, BaseDialogHeader, BaseDialogTitle,} from 
 import {BaseButton} from '@/components/base-ui/BaseButton';
 import {cn} from '@/utils/utils';
 import {logger} from '@/utils/logger';
+import {useAvailableModels} from "@/modules/use-available-models.ts";
+import {QuotaDashboard} from "@/components/business/QuotaDashboard.tsx";
 
 interface BusinessUserDetailProps {
   isOpen: boolean;
@@ -172,7 +174,7 @@ const BusinessUserDetail: React.FC<BusinessUserDetailProps> = ({
           <InfoItem
             icon={<Key className="h-4 w-4 text-orange-500" />}
             label="API 密钥"
-            value={user.api_key}
+            value={"****"}
             copyable
             fieldName="api_key"
           />

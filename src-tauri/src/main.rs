@@ -13,7 +13,6 @@ mod antigravity;
 mod app_settings;
 mod config_manager;
 mod constants;
-mod language_server;
 mod platform;
 mod system_tray;
 mod utils;
@@ -111,6 +110,7 @@ fn main() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_http::init())
         .manage(AppState::default())
         .setup(|app| setup::init(app))
         .invoke_handler(tauri::generate_handler![
@@ -166,11 +166,6 @@ fn main() {
             encrypt_config_data,
             write_text_file,
             write_frontend_log,
-            // Antigravity 语言服务器接口
-            language_server_get_user_status,
-            clear_all_cache_command,
-            get_cache_stats_command,
-            initialize_language_server_cache,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
