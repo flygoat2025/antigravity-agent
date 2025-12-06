@@ -84,7 +84,7 @@ pub async fn switch_antigravity_account(
 pub async fn get_antigravity_accounts(
     state: State<'_, crate::AppState>,
 ) -> Result<Vec<crate::AntigravityAccount>, String> {
-    tracing::info!("📋 开始获取所有 Antigravity 账户");
+    tracing::debug!("📋 开始获取所有 Antigravity 账户");
 
     let start_time = std::time::Instant::now();
 
@@ -134,7 +134,7 @@ pub async fn get_antigravity_accounts(
         // 按最后修改时间排序（最新的在前）
         accounts.sort_by(|a, b| b.last_switched.cmp(&a.last_switched));
 
-        tracing::info!(
+        tracing::debug!(
             "🎉 成功加载 {} 个账户",
             accounts.len()
         );
@@ -146,7 +146,7 @@ pub async fn get_antigravity_accounts(
 
     match result {
         Ok(accounts) => {
-            tracing::info!(
+            tracing::debug!(
                 duration_ms = duration.as_millis(),
                 account_count = accounts.len(),
                 "获取账户列表完成"

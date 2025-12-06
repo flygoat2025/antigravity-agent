@@ -66,11 +66,10 @@ jobs:
           cache-targets: true
           shared-key: tauri-${{ matrix.platform }}
 
-      - name: Sync node version and setup cache
+      - name: Sync node version
         uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
-          cache: 'npm'
 
       - name: Install frontend dependencies
         run: npm ci

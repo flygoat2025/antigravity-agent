@@ -46,9 +46,9 @@ function App() {
   // 处理语言服务的状态
   useEffect(() => {
     if (antigravityIsRunning.isRunning) {
-      languageServerState.initializeLanguageServerState()
+      languageServerState.initializeLanguageServerState();
     } else {
-      languageServerState.clearLanguageServerState()
+      languageServerState.clearLanguageServerState();
     }
   }, [antigravityIsRunning.isRunning]);
 

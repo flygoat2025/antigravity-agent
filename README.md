@@ -4,7 +4,9 @@
 
 ![dashborad.png](screenshots/dashboard.png)
 
-Windows/MacOS ✅️
+Windows ✅️
+MacOS ✅️
+Linux ✅️
 
 ## 下载安装
 

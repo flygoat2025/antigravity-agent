@@ -124,36 +124,33 @@ fn start_antigravity_macos() -> Result<String, String> {
 
 /// 在 Linux 平台启动 Antigravity
 fn start_antigravity_linux() -> Result<String, String> {
-    let mut errors = Vec::new();
-    let antigravity_paths = crate::path_utils::AppPaths::antigravity_executable_paths();
+    let antigravity_path = std::path::PathBuf::from("/usr/share/antigravity/antigravity");
 
-    // 尝试所有推测的路径
-    for path in &antigravity_paths {
-        if path.exists() {
-            match try_start_from_path(path) {
-                Ok(_) => {
-                    return Ok("Antigravity 已启动".to_string());
-                }
-                Err(e) => {
-                    errors.push(format!("{}: {}", path.display(), e));
-                }
-            }
-        } else {
-            errors.push(format!("{}: 文件不存在", path.display()));
-        }
+    if !antigravity_path.exists() {
+        return Err("Antigravity 未安装。请先安装 Antigravity 应用。".to_string());
     }
 
-    // 尝试系统 PATH 中的命令
-    let commands = vec!["antigravity", "Antigravity"];
-    match try_start_from_commands(commands) {
-        Ok(msg) => Ok(msg),
-        Err(e) => {
-            errors.push(e);
-            Err(format!(
-                "无法启动Antigravity。请手动启动Antigravity应用。\n尝试的方法：\n{}",
-                errors.join("\n")
-            ))
-        }
+    let mut cmd = std::process::Command::new(&antigravity_path);
+
+    // 设置桌面环境变量
+    cmd.env("XDG_SESSION_TYPE", "wayland");
+
+    // 如果当前有 DISPLAY，使用它；否则尝试常见值
+    if let Ok(display) = std::env::var("DISPLAY") {
+        cmd.env("DISPLAY", display);
+    } else {
+        cmd.env("DISPLAY", ":0");
+    }
+
+    // 设置其他必要的环境变量
+    if let Ok(xauthority) = std::env::var("XAUTHORITY") {
+        cmd.env("XAUTHORITY", xauthority);
+    }
+
+    match cmd.spawn()
+    {
+        Ok(_) => Ok("Antigravity 已启动".to_string()),
+        Err(e) => Err(format!("启动 Antigravity 失败: {}", e)),
     }
 }
 

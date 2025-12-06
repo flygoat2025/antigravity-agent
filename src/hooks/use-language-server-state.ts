@@ -6,6 +6,7 @@
 import { create } from 'zustand';
 import { ProcessCommands } from '@/commands/ProcessCommands';
 import { CacheCommands } from '@/commands/CacheCommands';
+import { PlatformCommands } from '@/commands/PlatformCommands';
 
 // 状态接口
 interface LanguageServerState {
@@ -24,11 +25,21 @@ interface LanguageServerActions {
 export const useLanguageServerState = create<LanguageServerState & LanguageServerActions>((set) => ({
   isLanguageServerStateInitialized: false,
   initializeLanguageServerState: async () => {
-    const result = await CacheCommands.initializeLanguageServerCache();
-    if (result.success) {
-      set({ isLanguageServerStateInitialized: true });
-    } else {
-      set({ isLanguageServerStateInitialized: false });
+    try {
+      // 仅在 Windows 平台下初始化
+      const platformInfo = await PlatformCommands.getInfo();
+      if (platformInfo.os !== 'windows') {
+        return;
+      }
+
+      const result = await CacheCommands.initializeLanguageServerCache();
+      if (result.success) {
+        set({ isLanguageServerStateInitialized: true });
+      } else {
+        set({ isLanguageServerStateInitialized: false });
+      }
+    } catch (error) {
+      // 忽略错误
     }
   },
   clearLanguageServerState: async () => {

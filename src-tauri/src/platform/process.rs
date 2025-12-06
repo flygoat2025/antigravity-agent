@@ -94,9 +94,6 @@ fn get_antigravity_process_patterns() -> Vec<ProcessPattern> {
         "linux" => {
             vec![
                 ProcessPattern::ExactName("antigravity"),
-                ProcessPattern::ExactName("Antigravity"),
-                ProcessPattern::Contains("Antigravity"),
-                ProcessPattern::CmdContains("antigravity"),
                 ProcessPattern::CmdContains("Antigravity.AppImage"),
             ]
         }
@@ -120,24 +117,10 @@ fn matches_antigravity_process(process_name: &str, process_cmd: &str, patterns: 
                     matched = true;
                 }
             }
-            ProcessPattern::Contains(text) => {
-                if process_name.contains(text) || process_cmd.contains(text) {
-                    tracing::debug!("✅ 包含匹配: {}", text);
-                    tracing::info!("🎯 匹配模式: ProcessPattern::Contains(\"{}\")", text);
-                    matched = true;
-                }
-            }
             ProcessPattern::CmdContains(text) => {
                 if process_cmd.contains(text) {
                     tracing::debug!("✅ 命令行包含匹配: {}", text);
                     tracing::info!("🎯 匹配模式: ProcessPattern::CmdContains(\"{}\")", text);
-                    matched = true;
-                }
-            }
-            ProcessPattern::CmdEndsWith(suffix) => {
-                if process_cmd.ends_with(suffix) {
-                    tracing::debug!("✅ 命令行后缀匹配: {}", suffix);
-                    tracing::info!("🎯 匹配模式: ProcessPattern::CmdEndsWith(\"{}\")", suffix);
                     matched = true;
                 }
             }
@@ -150,9 +133,7 @@ fn matches_antigravity_process(process_name: &str, process_cmd: &str, patterns: 
 #[derive(Debug, Clone)]
 pub enum ProcessPattern {
     ExactName(&'static str),    // 精确匹配进程名
-    Contains(&'static str),      // 包含指定文本
     CmdContains(&'static str),   // 命令行包含指定文本
-    CmdEndsWith(&'static str),   // 命令行以指定文本结尾
 }
 
 /// 获取 Antigravity 进程匹配模式（用于调试）
