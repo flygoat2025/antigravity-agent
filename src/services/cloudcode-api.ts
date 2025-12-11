@@ -125,5 +125,26 @@ export namespace CloudCodeAPI {
     return json;
   }
 
+  export async function userinfo(
+    access_token: string,
+  ) {
+
+    const response = await fetch(
+      'https://www.googleapis.com/oauth2/v2/userinfo',
+      {
+        headers: {
+          'Authorization': `Bearer ${access_token}`
+        }
+      },
+    );
+    const json = await response.json() as unknown as CloudCodeAPITypes.UserInfoResponse | CloudCodeAPITypes.ErrorResponse;
+
+    if ("error" in json) {
+      return Promise.reject(json);
+    }
+
+    return json;
+  }
+
 }
 

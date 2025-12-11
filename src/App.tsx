@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useDevToolsShortcut} from './hooks/use-devTools-shortcut.ts';
 import {useAntigravityAccount} from './modules/use-antigravity-account.ts';
+import {DATABASE_EVENTS, useDbMonitoringStore} from './modules/db-monitoring-store';
 import {useAntigravityIsRunning} from './hooks/use-antigravity-is-running.ts';
 import {Toaster} from 'react-hot-toast';
 import AppToolbar from './components/app/AppToolbar.tsx';
@@ -19,12 +20,28 @@ function App() {
   // 用户管理
   const antigravityAccount = useAntigravityAccount();
 
+  // 监听数据库变化事件
+  const dbMonitoringActions = useDbMonitoringStore();
+
+  useEffect(() => {
+    // 初始化监控（自动启动）
+    dbMonitoringActions.start();
+
+    // 添加事件监听器
+    const unlisten = dbMonitoringActions.addListener(DATABASE_EVENTS.DATA_CHANGED, antigravityAccount.insertOrUpdateCurrentAccount);
+
+    // 组件卸载时移除监听器
+    return () => {
+      unlisten()
+      dbMonitoringActions.stop()
+    };
+  }, []);
+
   // 启动 Antigravity 进程状态自动检查
   const antigravityIsRunning = useAntigravityIsRunning();
 
   useEffect(() => {
     antigravityIsRunning.start();
-
     antigravityAccount.insertOrUpdateCurrentAccount()
 
     return () => antigravityIsRunning.stop();
@@ -78,3 +95,4 @@ function App() {
 }
 
 export default App;
+

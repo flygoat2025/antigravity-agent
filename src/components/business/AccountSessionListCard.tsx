@@ -2,6 +2,7 @@ import React from 'react';
 import {motion} from 'framer-motion';
 import {cn} from "@/utils/utils.ts";
 import {Button, Space} from "antd";
+import {BaseAvatar} from "@/components/base-ui/BaseAvatar.tsx";
 
 interface UserSessionCardProps {
   nickName: string;
@@ -30,15 +31,17 @@ export function AccountSessionListCard(props: UserSessionCardProps) {
     >
       {/* 头部区域 */}
       <header className="flex items-center gap-4 mb-4">
-        <img
-          src={props.userAvatar}
+        <BaseAvatar
           className={cn(
             "h-12 w-12 rounded-full object-cover border-2 transition-all duration-300 flex-shrink-0 ring-2 ring-offset-2",
             props.isCurrentUser
               ? "border-blue-400 dark:border-blue-500 ring-blue-100 dark:ring-blue-900/50"
               : "border-gray-200 dark:border-gray-600 group-hover:border-blue-300 dark:group-hover:border-blue-500 ring-gray-100 dark:ring-gray-700/50 group-hover:ring-blue-100 dark:group-hover:ring-blue-900/30"
           )}
+          src={props.userAvatar}
+          alt={props.nickName}
         />
+
         <div className="flex-1">
           <h2 className="text-lg font-bold text-slate-900 leading-tight">{props.nickName}</h2>
           <p className="text-sm text-slate-500 font-medium">{props.email}</p>

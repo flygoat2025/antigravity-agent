@@ -3,16 +3,24 @@ import {AntigravityAccount} from "@/commands/types/account.types.ts";
 import {CloudCodeAPI} from "@/services/cloudcode-api.ts";
 import {CloudCodeAPITypes} from "@/services/cloudcode-api.types.ts";
 import {AccountCommands} from "@/commands/AccountCommands.ts";
+import {ProcessCommands} from "@/commands/ProcessCommands.ts";
 
 type State = {
-  data: Record<string, CloudCodeAPITypes.FetchAvailableModelsResponse>
+  data: Record<string, AccountAdditionData>
 }
 
 type Actions = {
   fetchData: (antigravityAccount: AntigravityAccount) => Promise<void>
 }
 
-export const useAvailableModels = create<State & Actions>((setState, getState) => ({
+export interface AccountAdditionData {
+  geminiQuote: number
+  claudeQuote: number
+  userAvatar: string
+  userId: string
+}
+
+export const useAccountAdditionData = create<State & Actions>((setState, getState) => ({
   data: {},
   fetchData: async (antigravityAccount: AntigravityAccount) => {
     let codeAssistResponse: CloudCodeAPITypes.LoadCodeAssistResponse | CloudCodeAPITypes.ErrorResponse = null
@@ -26,9 +34,10 @@ export const useAvailableModels = create<State & Actions>((setState, getState) =
     // 如果存在错误, 则使用 ouath 重新获取 access token
     if ("error" in codeAssistResponse) {
 
-      // 这里一定不是当前账户, 但是为了保险起见, 还是检查一下
+      // 避免冲突 如果是当前账户, 并且 Antigravity 在运行, 则不刷新 access token
       const currentAccount = await AccountCommands.getCurrentAntigravityAccount()
-      if (antigravityAccount.context.email === currentAccount?.context.email) {
+      const isAntigravityRunning = await ProcessCommands.isRunning()
+      if (antigravityAccount.context.email === currentAccount?.context.email && isAntigravityRunning) {
         return
       }
       // 刷新 access token
@@ -40,11 +49,17 @@ export const useAvailableModels = create<State & Actions>((setState, getState) =
     codeAssistResponse = await CloudCodeAPI.loadCodeAssist(antigravityAccount.auth.access_token);
 
     const modelsResponse = await CloudCodeAPI.fetchAvailableModels(antigravityAccount.auth.access_token, codeAssistResponse.cloudaicompanionProject);
+    const userInfoResponse = await CloudCodeAPI.userinfo(antigravityAccount.auth.access_token);
 
     setState({
       data: {
         ...getState().data,
-        [antigravityAccount.context.email]: modelsResponse
+        [antigravityAccount.context.email]: {
+          geminiQuote: modelsResponse.models["gemini-3-pro-high"].quotaInfo.remainingFraction,
+          claudeQuote: modelsResponse.models["claude-opus-4-5-thinking"].quotaInfo.remainingFraction,
+          userAvatar: userInfoResponse.picture,
+          userId: userInfoResponse.id,
+        }
       }
     })
   }

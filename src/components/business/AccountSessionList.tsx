@@ -10,6 +10,7 @@ export interface AccountSessionListAccountItem {
   email: string;
   nickName: string;
   userAvatar: string;
+  apiKey: string;
 }
 
 export interface AccountSessionListProps {
