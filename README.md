@@ -1,5 +1,7 @@
 # Antigravity Agent
 
+> 请注意, 目前 Antigravity Agent 仅在 https://github.com/MonchiLin/antigravity-agent/releases 分发, 涉及 Google 账户信息, 若您从其他来源下载, 请确保其来源可信。
+
 > 开箱即用的 Antigravity 账户管理程序。
 
 <img src="screenshots/dashboard.png" alt="dashboard" width="700" />
@@ -8,13 +10,13 @@ Windows ✅️
 
 MacOS ✅️
 
-Ubuntu(其他 Linux 发行版未经测试) ✅️
+Ubuntu(其余 Linux 发行版未经测试) ✅️
 
 ## 下载安装
 
 前往 [Releases](../../releases) 页面下载最新版本：
 
-## 📋 操作指南
+## 操作指南
 
 ### 首次启动
 1. 启动 Antigravity Agent
@@ -33,7 +35,7 @@ Ubuntu(其他 Linux 发行版未经测试) ✅️
 - **导出**: 选择保存位置，设置密码，导出所有账户配置
 - **导入**: 选择配置文件，输入密码，恢复账户数据
 
-## 🐛 Bug 反馈
+## Bug 反馈
 
 遇到问题时，请按照以下步骤提供日志以便快速定位和解决问题：
 
