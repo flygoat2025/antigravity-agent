@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {EyeOff, FileCode, FolderOpen, Monitor, Settings, VolumeX} from 'lucide-react';
+import {Bug, EyeOff, FileCode, FolderOpen, Monitor, Settings, VolumeX} from 'lucide-react';
 import {open} from '@tauri-apps/plugin-dialog';
 import {getVersion} from '@tauri-apps/api/app';
 import {BaseButton} from '@/components/base-ui/BaseButton';
@@ -26,10 +26,12 @@ const BusinessSettingsDialog: React.FC<BusinessSettingsDialogProps> = ({
   // 应用设置（统一管理）
   const systemTrayEnabled = useAppSettings(state => state.systemTrayEnabled);
   const silentStartEnabled = useAppSettings(state => state.silentStartEnabled);
+  const debugMode = useAppSettings(state => state.debugMode);
   const privateMode = useAppSettings(state => state.privateMode);
 
   const setSystemTrayEnabled = useAppSettings(state => state.setSystemTrayEnabled);
   const setSilentStartEnabled = useAppSettings(state => state.setSilentStartEnabled);
+  const setDebugMode = useAppSettings(state => state.setDebugMode);
   const setPrivateMode = useAppSettings(state => state.setPrivateMode);
 
   const loading = useAppSettings(state => state.loading);
@@ -159,10 +161,19 @@ const BusinessSettingsDialog: React.FC<BusinessSettingsDialogProps> = ({
           <SettingToggle
             icon={<EyeOff className="h-4 w-4 text-emerald-500"/>}
             title="隐私模式"
-            description="在用户卡片中隐藏邮箱和昵称"
+            description="对敏感信息进行混淆"
             checked={privateMode}
             onChange={setPrivateMode}
             isLoading={loading.privateMode}
+          />
+
+          <SettingToggle
+            icon={<Bug className="h-4 w-4 text-orange-500"/>}
+            title="调试模式"
+            description="记录更多日志（切换后自动重启程序）"
+            checked={debugMode}
+            onChange={setDebugMode}
+            isLoading={loading.debugMode}
           />
         </div>
 
