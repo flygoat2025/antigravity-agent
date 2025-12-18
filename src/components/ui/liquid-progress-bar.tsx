@@ -6,12 +6,12 @@ import ClaudeIcon from '@/assets/icons/claude.png'
 import GeminiImageIcon from '@/assets/icons/nano_banana.png'
 import GeminiProIcon from '@/assets/icons/gemini_pro.png'
 import GeminiFlashIcon from '@/assets/icons/gemini_flash.png'
+import dayjs from "dayjs";
+import {Tooltip} from "antd";
 
-import { Tooltip } from 'antd';
+type LiquidProgressBarType = 'gemini-pro' | 'gemini-flash' | 'claude' | 'gemini-image';
 
-export type LiquidProgressBarType = 'gemini-pro' | 'gemini-flash' | 'claude' | 'gemini-image';
-
-export interface LiquidProgressBarProps {
+interface LiquidProgressBarProps {
     type: LiquidProgressBarType;
     /**
      * 0-1. If 1, timer is hidden. -1 for unknown.
@@ -80,39 +80,6 @@ const getProgressColor = (type: LiquidProgressBarType, percentage: number, confi
     }
 };
 
-/**
- * Helper to calculate relative time string (e.g., "2d 5h", "3h 20m", "15m") from ISO string
- */
-function getRelativeTime(isoString?: string): string | null {
-    if (!isoString) return null;
-
-    try {
-        const target = new Date(isoString);
-        const now = new Date();
-        const diffMs = target.getTime() - now.getTime();
-
-        if (diffMs <= 0) return null; // Already passed
-
-        const diffMins = Math.floor(diffMs / 60000);
-        const diffHours = Math.floor(diffMins / 60);
-        const diffDays = Math.floor(diffHours / 24);
-
-        if (diffDays > 0) {
-            const h = diffHours % 24;
-            return `${diffDays}d ${h}h`;
-        }
-        if (diffHours > 0) {
-            const m = diffMins % 60;
-            return `${diffHours}h ${m}m`;
-        }
-        return `${diffMins}m`;
-
-    } catch (e) {
-        console.error("Invalid date string provided to LiquidProgressBar", isoString);
-        return null;
-    }
-}
-
 export function LiquidProgressBar({
     type,
     percentage,
@@ -127,7 +94,7 @@ export function LiquidProgressBar({
     // Logic: "If percentage is 1 then do not show resetIn"
     const showTimer = resetIn && percentage !== 1 && !isUnknown;
 
-    const relativeTime = useMemo(() => getRelativeTime(resetIn), [resetIn]);
+    const relativeTime = useMemo(() => dayjs().to(dayjs(resetIn), true), [resetIn]);
 
     // Determine dynamic colors
     const currentColors = getProgressColor(type, percentage, typeConfig);
@@ -189,7 +156,7 @@ export function LiquidProgressBar({
 
                     {/* Timer Badge */}
                     {!isUnknown && finalShowTimer && (
-                        <Tooltip title={`重置时间: ${resetIn}`} placement="top">
+                        <Tooltip title={`重置时间: ${dayjs.utc(resetIn).toDate().toLocaleString()}`} placement="top">
                             <div className={cn(
                                 "flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold leading-none cursor-help transition-colors",
                                 // Visual contrast check

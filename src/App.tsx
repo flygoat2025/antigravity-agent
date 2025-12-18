@@ -1,3 +1,4 @@
+import "./lib/dayjs-setup"
 import React, {useEffect, useState} from 'react';
 import {useDevToolsShortcut} from './hooks/use-devTools-shortcut.ts';
 import {useAntigravityAccount} from './modules/use-antigravity-account.ts';
